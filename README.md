@@ -31,6 +31,7 @@ Deploying to Azure using Terraform and GitHub Actions
     		- choco install terraform (https://learn.hashicorp.com/tutorials/terraform/install-cli)
 		- Create Terraform BackEnd storage account and container
 			- az group create -g replyTerraformLab -l northcentralus
+				<code>
 				response: 
 						{
 						  "id": "/subscriptions/475a2aea-10e5-4288-abc9-9efd4f3dc215/resourceGroups/replyTerraformLab",
@@ -43,6 +44,7 @@ Deploying to Azure using Terraform and GitHub Actions
 						  "tags": null,
 						  "type": "Microsoft.Resources/resourceGroups"
 						}
+				</code>
 			- az storage account create -n sareplyterraformlab -g replyTerraformLab -l northcentralus --sku Standard_LRS
 				response:
 						{
