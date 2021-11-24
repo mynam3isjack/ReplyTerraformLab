@@ -12,6 +12,7 @@ Deploying to Azure using Terraform and GitHub Actions
 			- az ad sp create-for-rbac --name "replyTerraformLab" --role Contributor --scopes /subscriptions/<subscription-id> --sdk-auth
 		- Save the output of the command. You’ll need this information later in the process.
 		- example:  
+  
 					{
 					"clientId": "feadf2df-afd7-4d70-bb4d-594b5dcabdae",
 					"clientSecret": "O0R626e5X4BfLZ4KV~d1d9u5w8_-r6V6x9",
@@ -24,6 +25,7 @@ Deploying to Azure using Terraform and GitHub Actions
 					"galleryEndpointUrl": "https://gallery.azure.com/",
 					"managementEndpointUrl": "https://management.core.windows.net/"
 					}
+
 		- More dettailed information <a href="https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/service_principal_client_secret">here</a>
 
 - Step 1.4: Download Terraform and save it in the system path
@@ -32,6 +34,7 @@ Deploying to Azure using Terraform and GitHub Actions
 		- Create Terraform BackEnd storage account and container
 			- az group create -g replyTerraformLab -l northcentralus				
 				response: 
+
 						{
 						  "id": "/subscriptions/475a2aea-10e5-4288-abc9-9efd4f3dc215/resourceGroups/replyTerraformLab",
 						  "location": "northcentralus",
@@ -42,9 +45,11 @@ Deploying to Azure using Terraform and GitHub Actions
 						  },
 						  "tags": null,
 						  "type": "Microsoft.Resources/resourceGroups"
-						}				
+						}	
+
 			- az storage account create -n sareplyterraformlab -g replyTerraformLab -l northcentralus --sku Standard_LRS
 				response:
+
 						{
 						  "accessTier": "Hot",
 						  "allowBlobPublicAccess": true,
@@ -130,8 +135,10 @@ Deploying to Azure using Terraform and GitHub Actions
 						  "tags": {},
 						  "type": "Microsoft.Storage/storageAccounts"
 						}
+
 			- az storage container create -n terraform-state --account-name sareplyterraformlab
-				response:				
+				response:	
+
 						{
 						  "created": true
 						}
@@ -139,7 +146,7 @@ Deploying to Azure using Terraform and GitHub Actions
 - Step 2.1: Terraform configuration
 		Create a new file main.tf in the root of Git repo
 		example:
-		
+
 				provider "azurerm" {
 					version = "=2.0.0"
 					features {}
