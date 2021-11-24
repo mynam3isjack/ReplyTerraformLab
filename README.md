@@ -16,10 +16,10 @@ Deploying to Azure using Terraform and GitHub Actions
 		
 		example:
 				{
-				"clientId": "feadf2df-afd7-4d70-bb4d-594b5dcabdae",
-				"clientSecret": "O0R626e5X4BfLZ4KV~d1d9u5w8_-r6V6x9",
-				"subscriptionId": "475a2aea-10e5-4288-abc9-9efd4f3dc215",
-				"tenantId": "2988608b-70b9-4911-9303-78aadfa95034",
+				"clientId": "#############",
+				"clientSecret": ""#############",",
+				"subscriptionId": "#############",
+				"tenantId": "#############",
 				"activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
 				"resourceManagerEndpointUrl": "https://management.azure.com/",
 				"activeDirectoryGraphResourceId": "https://graph.windows.net/",
@@ -41,7 +41,7 @@ Deploying to Azure using Terraform and GitHub Actions
 
 				response: 
 						{
-						"id": "/subscriptions/475a2aea-10e5-4288-abc9-9efd4f3dc215/resourceGroups/replyTerraformLab",
+						"id": "/subscriptions/#############/resourceGroups/replyTerraformLab",
 						"location": "northcentralus",
 						"managedBy": null,
 						"name": "replyTerraformLab",
@@ -90,7 +90,7 @@ Deploying to Azure using Terraform and GitHub Actions
 						  "extendedLocation": null,
 						  "failoverInProgress": null,
 						  "geoReplicationStats": null,
-						  "id": "/subscriptions/475a2aea-10e5-4288-abc9-9efd4f3dc215/resourceGroups/replyTerraformLab/providers/Microsoft.Storage/storageAccounts/sareplyterraformlab",
+						  "id": "/subscriptions/#############/resourceGroups/replyTerraformLab/providers/Microsoft.Storage/storageAccounts/sareplyterraformlab",
 						  "identity": null,
 						  "immutableStorageWithVersioning": null,
 						  "isHnsEnabled": null,
@@ -156,8 +156,8 @@ Deploying to Azure using Terraform and GitHub Actions
 				provider "azurerm" {
 					version = "=2.0.0"
 					features {}
-					subscription_id = "475a2aea-10e5-4288-abc9-9efd4f3dc215" # jacopo.devecchis@outlook.com
-  					tenant_id = "2988608b-70b9-4911-9303-78aadfa95034" # jacopo.devecchis@outlook.com
+					subscription_id = "#############" # jacopo.devecchis@outlook.com
+  					tenant_id = "#############" # jacopo.devecchis@outlook.com
 				}
 
 				terraform {
@@ -214,10 +214,10 @@ Deploying to Azure using Terraform and GitHub Actions
 			runs-on: ubuntu-latest
 
 			env:
-			ARM_CLIENT_ID: feadf2df-afd7-4d70-bb4d-594b5dcabdae
+			ARM_CLIENT_ID: #############
 			ARM_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
-			ARM_SUBSCRIPTION_ID: 475a2aea-10e5-4288-abc9-9efd4f3dc215
-			ARM_TENANT_ID: 2988608b-70b9-4911-9303-78aadfa95034
+			ARM_SUBSCRIPTION_ID: #############
+			ARM_TENANT_ID: #############
 
 			steps:
 			- uses: actions/checkout@v2
@@ -250,10 +250,10 @@ Deploying to Azure using Terraform and GitHub Actions
 			runs-on: ubuntu-latest
 			
 			env:
-			ARM_CLIENT_ID: feadf2df-afd7-4d70-bb4d-594b5dcabdae
+			ARM_CLIENT_ID: #############
 			ARM_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
-			ARM_SUBSCRIPTION_ID: 475a2aea-10e5-4288-abc9-9efd4f3dc215
-			ARM_TENANT_ID: 2988608b-70b9-4911-9303-78aadfa95034
+			ARM_SUBSCRIPTION_ID: #############
+			ARM_TENANT_ID: #############
 			
 			steps:
 			- uses: actions/checkout@v2
