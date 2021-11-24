@@ -139,6 +139,7 @@ Deploying to Azure using Terraform and GitHub Actions
 - Step 2.1: Terraform configuration
 		Create a new file main.tf in the root of Git repo
 		example:
+		
 				provider "azurerm" {
 					version = "=2.0.0"
 					features {}
