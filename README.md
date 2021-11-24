@@ -11,7 +11,7 @@ Deploying to Azure using Terraform and GitHub Actions
 		- Run the following command to create the service principal and grant it Contributor access to the Azure subscription:
 			- az ad sp create-for-rbac --name "replyTerraformLab" --role Contributor --scopes /subscriptions/<subscription-id> --sdk-auth
 		- Save the output of the command. You’ll need this information later in the process.
-		- example:
+		- example:  
 					{
 					"clientId": "feadf2df-afd7-4d70-bb4d-594b5dcabdae",
 					"clientSecret": "O0R626e5X4BfLZ4KV~d1d9u5w8_-r6V6x9",
@@ -30,8 +30,7 @@ Deploying to Azure using Terraform and GitHub Actions
 		- install terraform by chocolately plugin (windows):
     		- choco install terraform (https://learn.hashicorp.com/tutorials/terraform/install-cli)
 		- Create Terraform BackEnd storage account and container
-			- az group create -g replyTerraformLab -l northcentralus
-				<code>
+			- az group create -g replyTerraformLab -l northcentralus				
 				response: 
 						{
 						  "id": "/subscriptions/475a2aea-10e5-4288-abc9-9efd4f3dc215/resourceGroups/replyTerraformLab",
@@ -43,8 +42,7 @@ Deploying to Azure using Terraform and GitHub Actions
 						  },
 						  "tags": null,
 						  "type": "Microsoft.Resources/resourceGroups"
-						}
-				</code>
+						}				
 			- az storage account create -n sareplyterraformlab -g replyTerraformLab -l northcentralus --sku Standard_LRS
 				response:
 						{
@@ -133,7 +131,7 @@ Deploying to Azure using Terraform and GitHub Actions
 						  "type": "Microsoft.Storage/storageAccounts"
 						}
 			- az storage container create -n terraform-state --account-name sareplyterraformlab
-				response:
+				response:				
 						{
 						  "created": true
 						}
@@ -186,5 +184,6 @@ Deploying to Azure using Terraform and GitHub Actions
 - Step 3.1: Create Github Actions 
           - Create a folder .github and a subfolder workflows in the Git repo
           - Create workflows based on GitHub Actions Workflow YAML - <a href="https://learn.hashicorp.com/tutorials/terraform/github-actions#github-actions-workflow-yaml">Details</a>
+
 
 
