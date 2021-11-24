@@ -1,5 +1,4 @@
 provider "azurerm" {
-  version = "~> 2.65"
   features {}
   subscription_id = "475a2aea-10e5-4288-abc9-9efd4f3dc215" # jacopo.devecchis@outlook.com
   tenant_id = "2988608b-70b9-4911-9303-78aadfa95034" # jacopo.devecchis@outlook.com
@@ -15,7 +14,7 @@ terraform {
 }
 
 resource "azurerm_resource_group" "replyTerraformLab_resource_group" {
-  name     = "${var.name}-terraform-resources"
+  name     = "replyTerraformLab_resource_group"
   location = "northcentralus"
 }
 

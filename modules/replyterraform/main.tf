@@ -10,11 +10,5 @@ provider "azurerm" {
 resource "azurerm_resource_group" "replyTerraformLab_resource_group" {
   name     = "${var.name}-terraform-resources"
   location = var.location
-  
-  tags = {
-    application = "TerraformLab1"
-    environment = var.environment
-    name        = "Terraform Lab Resource Group"
-  }
 }
 
