@@ -200,5 +200,77 @@ Deploying to Azure using Terraform and GitHub Actions
   - Create a folder .github and a subfolder workflows in the Git repo
   - Create workflows based on GitHub Actions Workflow YAML - <a href="https://learn.hashicorp.com/tutorials/terraform/github-actions#github-actions-workflow-yaml">Details</a>
 
+- Step 3.2: Example of Pull Request validation workflow
+	- Create a file terraform-plan.yml in the workflows subfolder.
 
+		name: Terraform Plan
+
+		on:
+		pull_request:
+			branches: [ master ]
+
+		jobs:
+		terraform:
+			runs-on: ubuntu-latest
+
+			env:
+			ARM_CLIENT_ID: feadf2df-afd7-4d70-bb4d-594b5dcabdae
+			ARM_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
+			ARM_SUBSCRIPTION_ID: 475a2aea-10e5-4288-abc9-9efd4f3dc215
+			ARM_TENANT_ID: 2988608b-70b9-4911-9303-78aadfa95034
+
+			steps:
+			- uses: actions/checkout@v2
+
+			- name: Setup Terraform
+				uses: hashicorp/setup-terraform@v1
+
+			- name: Terraform Init
+				run: terraform init
+
+			- name: Terraform Format
+				run: terraform fmt -check
+
+			- name: Terraform Plan
+				run: terraform plan
+
+    - This workflow will automatically trigger on all pull requests into the master branch and generate Terraform execution plan for the proposed change. The pull request approver can then easily review the change without having to pull the branch and generating the execution plan locally. 
+
+- Step 3.3: Example of Apply changes on merge
+  - Create another file terraform-apply.yml in the workflows subfolder.
+
+		name: Terraform Apply
+
+		on:
+		push:
+			branches: [ master ]
+
+		jobs:
+		terraform:
+			runs-on: ubuntu-latest
+			
+			env:
+			ARM_CLIENT_ID: feadf2df-afd7-4d70-bb4d-594b5dcabdae
+			ARM_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
+			ARM_SUBSCRIPTION_ID: 475a2aea-10e5-4288-abc9-9efd4f3dc215
+			ARM_TENANT_ID: 2988608b-70b9-4911-9303-78aadfa95034
+			
+			steps:
+			- uses: actions/checkout@v2
+			
+			- name: Setup Terraform
+				uses: hashicorp/setup-terraform@v1
+			
+			- name: Terraform Init
+				run: terraform init
+				
+			- name: Terraform Apply
+				run: terraform apply -auto-approve
+
+	- This workflow will automatically deploy changes merged to the master branch. You’d want to make sure that the master branch is protected and all changes successfully pass the pull request validation before they get merged.
+
+- Step 3.4: Create the repository secret
+  -  The final step of the GitHub repo configuration is creating the TF_ARM_CLIENT_SECRET secret referenced by the workflows.
+  -  Navigate to the repository Settings page, then select Secrets in the left nav. Create a new secret TF_ARM_CLIENT_SECRET using the client secret value from step 1.3.
+  - For more details about the creation of GitHub secres are <a href="https://docs.github.com/en/actions/security-guides/encrypted-secrets">here</a> 
 
