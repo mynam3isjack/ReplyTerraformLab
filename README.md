@@ -274,3 +274,15 @@ Deploying to Azure using Terraform and GitHub Actions
   -  Navigate to the repository Settings page, then select Secrets in the left nav. Create a new secret TF_ARM_CLIENT_SECRET using the client secret value from step 1.3.
   - For more details about the creation of GitHub secres are <a href="https://docs.github.com/en/actions/security-guides/encrypted-secrets">here</a> 
 
+- Step 4.1: Test the workflow
+
+- Step 4.2: Validate changes
+  - Checkout a new branch using 'git checkout -b <branch-name>' and commit your changes.
+  - Publish the branch and create a pull request.
+  - You should see the Terraform Plan workflow kick off automatically after a few seconds.
+  - Click on Details and drilldown into the Terraform Plan step to review the execution plan.
+
+- Step 4.3: Apply changes
+  - If you are satisfied with the Terraform plan, merge the pull request.
+  - Navigate to the Actions tab. You should see the Terraform Apply workflow kick off automatically after the merge.
+  - Drilldown into the Terraform Apply logs to verify that the changes were deployed.
