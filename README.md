@@ -1,7 +1,7 @@
 Deploying to Azure using Terraform and GitHub Actions
 
 - Step 1.1: Create new github repo
-		- Add .gitignore by terraform template (https://github.com/github/gitignore/blob/master/Terraform.gitignore)
+		- Add .gitignore by terraform template - <a href="https://github.com/github/gitignore/blob/master/Terraform.gitignore">Details</a>
 
 - Step 1.2: Azure CLI
 		- Authenticate with Azure using the az login command. (If you have access to multiple Azure subscriptions, select a specific one by running az account set -s <subscription-id>. You can see the list of subscriptions you have access to by running az account list.)
@@ -24,7 +24,7 @@ Deploying to Azure using Terraform and GitHub Actions
 					"galleryEndpointUrl": "https://gallery.azure.com/",
 					"managementEndpointUrl": "https://management.core.windows.net/"
 					}
-		- More dettailed information here: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/service_principal_client_secret
+		- More dettailed information <a href="https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/service_principal_client_secret">here</a>
 
 - Step 1.4: Download Terraform and save it in the system path
 		- install terraform by chocolately plugin (windows):
@@ -183,6 +183,6 @@ Deploying to Azure using Terraform and GitHub Actions
 
 - Step 3.1: Create Github Actions 
           - Create a folder .github and a subfolder workflows in the Git repo
-          - Create workflows based on GitHub Actions Workflow YAML - <a href="https://learn.hashicorp.com/tutorials/terraform/github-actions#github-actions-workflow-yaml">Dettails</a>
+          - Create workflows based on GitHub Actions Workflow YAML - <a href="https://learn.hashicorp.com/tutorials/terraform/github-actions#github-actions-workflow-yaml">Details</a>
 
 
