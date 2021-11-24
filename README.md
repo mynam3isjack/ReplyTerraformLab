@@ -183,6 +183,6 @@ Deploying to Azure using Terraform and GitHub Actions
 
 - Step 3.1: Create Github Actions 
           - Create a folder .github and a subfolder workflows in the Git repo
-          - Create workflows based on GitHub Actions Workflow YAML <a href="https://learn.hashicorp.com/tutorials/terraform/github-actions#github-actions-workflow-yaml"></a>
+          - Create workflows based on GitHub Actions Workflow YAML - <a href="https://learn.hashicorp.com/tutorials/terraform/github-actions#github-actions-workflow-yaml">Dettails</a>
 
 
