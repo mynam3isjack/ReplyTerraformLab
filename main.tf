@@ -15,7 +15,7 @@ terraform {
 }
 
 resource "azurerm_resource_group" "replyTerraformLab_resource_group" {
-  name     = "replyTerraformLab_resource_group"
+  name     = "${var.name}-terraform-resources"
   location = "northcentralus"
 }
 

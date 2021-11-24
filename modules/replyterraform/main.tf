@@ -7,7 +7,7 @@ provider "azurerm" {
   }
 }
 
-resource "azurerm_resource_group" "terraform_rg" {
+resource "azurerm_resource_group" "replyTerraformLab_resource_group" {
   name     = "${var.name}-terraform-resources"
   location = var.location
   
