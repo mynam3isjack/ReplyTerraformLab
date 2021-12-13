@@ -3,7 +3,7 @@ provider "azurerm" {
 }
 
 terraform {
-  backend "azurerm_lab" {
+  backend "azurerm" {
     resource_group_name  = "replyTerraformLab"
     storage_account_name = "sareplyterraformlab"
     container_name       = "terraform-state"
