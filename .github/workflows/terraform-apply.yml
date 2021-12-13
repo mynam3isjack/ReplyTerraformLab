@@ -1,70 +1,140 @@
-name: Terraform Apply
+name: Terraform-Apply
 
 on:
   push:
     branches: [ lab ]
+    paths-ignore:
+      - '**.md'
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
+    paths-ignore:
+      - '**.md'
+env:
+  GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+  TF_IN_AUTOMATION: true
+  ARM_CLIENT_ID: 404cb109-2150-4ce9-9615-b7755da17209
+  ARM_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
+  ARM_SUBSCRIPTION_ID: 71a3925d-615b-4b25-82e5-f7c9e6f24e6b
+  ARM_TENANT_ID: ce849bab-cc1c-465b-b62e-18f07c9ac198
 
 jobs:
-  terraform:
+  terraform-plan:
+    name: Terraform Plan
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    
-    env:
-      ARM_CLIENT_ID: 404cb109-2150-4ce9-9615-b7755da17209
-      ARM_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
-      ARM_SUBSCRIPTION_ID: 71a3925d-615b-4b25-82e5-f7c9e6f24e6b
-      ARM_TENANT_ID: ce849bab-cc1c-465b-b62e-18f07c9ac198
-      
+
     steps:
-      - uses: actions/checkout@v2
-      
-      - name: Setup Terraform
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Terraform Setup
         uses: hashicorp/setup-terraform@v1
       
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+
       - name: Terraform Init
-        run: terraform init
-        
+        id: init
+        env:
+          # overriding HOME before making global git config changes
+          HOME: ${{ runner.temp }}
+        run: |
+          # use github token transparently for cloning terraform module repositories
+          git config --global --add http."https://atc-github.azure.cloud.bmw/".extraheader "AUTHORIZATION: basic $(echo -n "x-access-token:$GITHUB_TOKEN" | base64)"
+          terraform init -upgrade
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan (staging)
+        id: plan-staging
+        run: |
+          terraform workspace select staging || terraform workspace new staging
+          terraform plan -no-color
+
+      - name: Terraform Plan (prod)
+        id: plan-prod
+        run: |
+          terraform workspace select prod || terraform workspace new prod
+          terraform plan -no-color
+
+      - name: Outputs
+        uses: actions/github-script@v4
+        env:
+          PLAN_STAGING: "terraform\n${{ steps.plan-staging.outputs.stdout }}"
+          PLAN_PROD: "terraform\n${{ steps.plan-prod.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            #### Terraform Plan (staging) 📖\`${{ steps.plan-staging.outcome }}\`
+            #### Terraform Plan (prod) 📖\`${{ steps.plan-prod.outcome }}\`
+
+            <details><summary>Show Plan (staging)</summary>
+
+            \`\`\`terraform\n
+            ${process.env.PLAN_STAGING}
+            \`\`\`
+
+            </details>
+
+            <details><summary>Show Plan (prod)</summary>
+
+            \`\`\`terraform\n
+            ${process.env.PLAN_PROD}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+  terraform-apply-staging:
+    name: Terraform Apply (staging)
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    environment:
+      name: staging
+
+    steps:
+      - name: Checkout with Submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Terraform Setup
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Init
+        env:
+          # overriding HOME before making global git config changes
+          HOME: ${{ runner.temp }}
+        run: |
+          # use github token transparently for cloning terraform module repositories
+          git config --global --add http."https://atc-github.azure.cloud.bmw/".extraheader "AUTHORIZATION: basic $(echo -n "x-access-token:$GITHUB_TOKEN" | base64)"
+          terraform init -upgrade
+
       - name: Terraform Apply
-        run: terraform apply -auto-approve
-
-  # terraform-apply-lab:
-  #   name: Terraform Apply (lab)
-  #   #if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-  #   if: github.event_name == 'push' || github.event_name == 'pull'
-  #   runs-on: ubuntu-latest
-
-  #   environment:
-  #     name: lab
-
-  #   steps:
-  #     - name: Checkout with Submodules
-  #       uses: actions/checkout@v2
-  #       with:
-  #         submodules: true
-
-  #     - name: Terraform Setup
-  #       uses: hashicorp/setup-terraform@v1
-
-  #     - name: Terraform Init
-  #       env:
-  #         # overriding HOME before making global git config changes
-  #         HOME: ${{ runner.temp }}
-  #       run: |
-  #         # use github token transparently for cloning terraform module repositories
-  #         git config --global --add http."https://atc-github.azure.cloud.bmw/".extraheader "AUTHORIZATION: basic $(echo -n "x-access-token:$GITHUB_TOKEN" | base64)"
-  #         terraform init -upgrade
-
-  #     - name: Terraform Apply
-  #       run: |
-  #         terraform workspace select lab
-  #         terraform apply -auto-approve
+        run: |
+          terraform workspace select staging
+          terraform apply -auto-approve
 
   terraform-apply-prod:
     name: Terraform Apply (prod)
-    #if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-    if: github.event_name == 'push' || github.event_name == 'pull'
-    needs: terraform-apply-lab
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    needs: terraform-apply-staging
     runs-on: ubuntu-latest
 
     environment:
