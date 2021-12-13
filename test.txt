@@ -1,0 +1,64 @@
+terraform-apply-lab:
+    name: Terraform Apply (lab)
+    #if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'pull'
+    runs-on: self-hosted
+
+    environment:
+      name: lab
+
+    steps:
+      - name: Checkout with Submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Terraform Setup
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Init
+        env:
+          # overriding HOME before making global git config changes
+          HOME: ${{ runner.temp }}
+        run: |
+          # use github token transparently for cloning terraform module repositories
+          git config --global --add http."https://atc-github.azure.cloud.bmw/".extraheader "AUTHORIZATION: basic $(echo -n "x-access-token:$GITHUB_TOKEN" | base64)"
+          terraform init -upgrade
+
+      - name: Terraform Apply
+        run: |
+          terraform workspace select lab
+          terraform apply -auto-approve
+
+  terraform-apply-prod:
+    name: Terraform Apply (prod)
+    #if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'pull'
+    needs: terraform-apply-lab
+    runs-on: self-hosted
+
+    environment:
+      name: prod
+
+    steps:
+      - name: Checkout with Submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Terraform Setup
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Init
+        env:
+          # overriding HOME before making global git config changes
+          HOME: ${{ runner.temp }}
+        run: |
+          # use github token transparently for cloning terraform module repositories
+          git config --global --add http."https://atc-github.azure.cloud.bmw/".extraheader "AUTHORIZATION: basic $(echo -n "x-access-token:$GITHUB_TOKEN" | base64)"
+          terraform init -upgrade
+
+      - name: Terraform Apply
+        run: |
+          terraform workspace select prod
+          terraform apply -auto-approve
