@@ -1,9 +1,5 @@
-provider "azurerm" {
-  features {}
-}
-
 terraform {
-  backend "azurerm" {
+  backend "azurerm_prod" {
     resource_group_name  = "replyTerraform_prod"
     storage_account_name = "sareplyterraform_prod"
     container_name       = "terraform-state_prod"
