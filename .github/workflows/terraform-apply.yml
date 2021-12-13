@@ -52,13 +52,13 @@ jobs:
       - name: Terraform Plan (lab)
         id: plan-lab
         run: |
-          terraform workspace new lab
+          terraform workspace select lab || terraform workspace new lab
           terraform plan -no-color
 
       - name: Terraform Plan (prod)
         id: plan-prod
         run: |
-          terraform workspace new prod
+          terraform workspace select prod || terraform workspace new prod
           terraform plan -no-color
 
       - name: Outputs
