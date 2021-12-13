@@ -20,7 +20,7 @@ env:
 jobs:
   terraform-plan:
     name: Terraform Plan
-    if: github.event_name == 'pull_request'
+    # if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     steps:
@@ -102,7 +102,7 @@ jobs:
 
   terraform-apply-staging:
     name: Terraform Apply (staging)
-    if: github.ref == 'lab' && github.event_name == 'push'
+    # if: github.ref == 'lab' && github.event_name == 'push'
     runs-on: ubuntu-latest
 
     environment:
@@ -133,7 +133,7 @@ jobs:
 
   terraform-apply-prod:
     name: Terraform Apply (prod)
-    if: github.ref == 'lab' && github.event_name == 'push'
+    # if: github.ref == 'lab' && github.event_name == 'push'
     needs: terraform-apply-staging
     runs-on: ubuntu-latest
 
