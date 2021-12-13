@@ -3,8 +3,6 @@ name: Terraform Apply
 on:
   push:
     branches: [ lab ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   # terraform:

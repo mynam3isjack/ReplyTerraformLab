@@ -1,11 +1,13 @@
-name: Terraform Plan
+name: Terraform-Plan
 
 on:
   pull_request:
     branches: [ main ]
 
 jobs:
-  terraform:
+  terraform-plan:
+    name: Terraform Plan
+    # if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     env:
@@ -15,16 +17,78 @@ jobs:
       ARM_TENANT_ID: ce849bab-cc1c-465b-b62e-18f07c9ac198
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      - name: Setup Terraform
+      - name: Terraform Setup
         uses: hashicorp/setup-terraform@v1
+      
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check -recursive
+        continue-on-error: true
 
       - name: Terraform Init
-        run: terraform init
+        id: init
+        env:
+          # overriding HOME before making global git config changes
+          HOME: ${{ runner.temp }}
+        run: |
+          # use github token transparently for cloning terraform module repositories
+          git config --global --add http."https://atc-github.azure.cloud.bmw/".extraheader "AUTHORIZATION: basic $(echo -n "x-access-token:$GITHUB_TOKEN" | base64)"
+          terraform init -upgrade
 
-      - name: Terraform Format
-        run: terraform fmt -check
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
 
-      - name: Treraform Plan
-        run: terraform plan
+      - name: Terraform Plan (lab)
+        id: plan-lab
+        run: |
+          terraform workspace select lab || terraform workspace new lab
+          terraform plan -no-color
+
+      - name: Terraform Plan (prod)
+        id: plan-prod
+        run: |
+          terraform workspace select prod || terraform workspace new prod
+          terraform plan -no-color
+
+      - name: Outputs
+        uses: actions/github-script@v4
+        env:
+          PLAN_lab: "terraform\n${{ steps.plan-lab.outputs.stdout }}"
+          PLAN_PROD: "terraform\n${{ steps.plan-prod.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            #### Terraform Plan (lab) 📖\`${{ steps.plan-lab.outcome }}\`
+            #### Terraform Plan (prod) 📖\`${{ steps.plan-prod.outcome }}\`
+
+            <details><summary>Show Plan (lab)</summary>
+
+            \`\`\`terraform\n
+            ${process.env.PLAN_lab}
+            \`\`\`
+
+            </details>
+
+            <details><summary>Show Plan (prod)</summary>
+
+            \`\`\`terraform\n
+            ${process.env.PLAN_PROD}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
