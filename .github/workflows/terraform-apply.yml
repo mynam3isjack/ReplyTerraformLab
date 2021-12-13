@@ -3,25 +3,92 @@ name: Terraform Apply
 on:
   push:
     branches: [ lab ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  terraform:
-    runs-on: ubuntu-latest
+  # terraform:
+  #   runs-on: ubuntu-latest
     
-    env:
-      ARM_CLIENT_ID: 404cb109-2150-4ce9-9615-b7755da17209
-      ARM_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
-      ARM_SUBSCRIPTION_ID: 71a3925d-615b-4b25-82e5-f7c9e6f24e6b
-      ARM_TENANT_ID: ce849bab-cc1c-465b-b62e-18f07c9ac198
+  #   env:
+  #     ARM_CLIENT_ID: 404cb109-2150-4ce9-9615-b7755da17209
+  #     ARM_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
+  #     ARM_SUBSCRIPTION_ID: 71a3925d-615b-4b25-82e5-f7c9e6f24e6b
+  #     ARM_TENANT_ID: ce849bab-cc1c-465b-b62e-18f07c9ac198
       
-    steps:
-      - uses: actions/checkout@v2
+  #   steps:
+  #     - uses: actions/checkout@v2
       
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+  #     - name: Setup Terraform
+  #       uses: hashicorp/setup-terraform@v1
       
-      - name: Terraform Init
-        run: terraform init
+  #     - name: Terraform Init
+  #       run: terraform init
         
+  #     - name: Terraform Apply
+  #       run: terraform apply -auto-approve
+
+  terraform-apply-lab:
+    name: Terraform Apply (lab)
+    #if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'pull'
+    runs-on: self-hosted
+
+    environment:
+      name: lab
+
+    steps:
+      - name: Checkout with Submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Terraform Setup
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Init
+        env:
+          # overriding HOME before making global git config changes
+          HOME: ${{ runner.temp }}
+        run: |
+          # use github token transparently for cloning terraform module repositories
+          git config --global --add http."https://atc-github.azure.cloud.bmw/".extraheader "AUTHORIZATION: basic $(echo -n "x-access-token:$GITHUB_TOKEN" | base64)"
+          terraform init -upgrade
+
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: |
+          terraform workspace select lab
+          terraform apply -auto-approve
+
+  terraform-apply-prod:
+    name: Terraform Apply (prod)
+    #if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    if: github.event_name == 'push' || github.event_name == 'pull'
+    needs: terraform-apply-lab
+    runs-on: self-hosted
+
+    environment:
+      name: prod
+
+    steps:
+      - name: Checkout with Submodules
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Terraform Setup
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Init
+        env:
+          # overriding HOME before making global git config changes
+          HOME: ${{ runner.temp }}
+        run: |
+          # use github token transparently for cloning terraform module repositories
+          git config --global --add http."https://atc-github.azure.cloud.bmw/".extraheader "AUTHORIZATION: basic $(echo -n "x-access-token:$GITHUB_TOKEN" | base64)"
+          terraform init -upgrade
+
+      - name: Terraform Apply
+        run: |
+          terraform workspace select prod
+          terraform apply -auto-approve
