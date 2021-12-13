@@ -10,6 +10,12 @@ jobs:
     # if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
+    env:
+      ARM_CLIENT_ID: 404cb109-2150-4ce9-9615-b7755da17209
+      ARM_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
+      ARM_SUBSCRIPTION_ID: 71a3925d-615b-4b25-82e5-f7c9e6f24e6b
+      ARM_TENANT_ID: ce849bab-cc1c-465b-b62e-18f07c9ac198
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
