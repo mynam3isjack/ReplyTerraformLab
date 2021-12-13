@@ -49,10 +49,10 @@ jobs:
         id: validate
         run: terraform validate -no-color
 
-      - name: Terraform Plan (staging)
-        id: plan-staging
+      - name: Terraform Plan (lab)
+        id: plan-lab
         run: |
-          terraform workspace select staging || terraform workspace new staging
+          terraform workspace select lab || terraform workspace new lab
           terraform plan -no-color
 
       - name: Terraform Plan (prod)
@@ -64,7 +64,7 @@ jobs:
       - name: Outputs
         uses: actions/github-script@v4
         env:
-          PLAN_STAGING: "terraform\n${{ steps.plan-staging.outputs.stdout }}"
+          PLAN_lab: "terraform\n${{ steps.plan-lab.outputs.stdout }}"
           PLAN_PROD: "terraform\n${{ steps.plan-prod.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -72,13 +72,13 @@ jobs:
             const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
-            #### Terraform Plan (staging) 📖\`${{ steps.plan-staging.outcome }}\`
+            #### Terraform Plan (lab) 📖\`${{ steps.plan-lab.outcome }}\`
             #### Terraform Plan (prod) 📖\`${{ steps.plan-prod.outcome }}\`
 
-            <details><summary>Show Plan (staging)</summary>
+            <details><summary>Show Plan (lab)</summary>
 
             \`\`\`terraform\n
-            ${process.env.PLAN_STAGING}
+            ${process.env.PLAN_lab}
             \`\`\`
 
             </details>
@@ -100,8 +100,8 @@ jobs:
               body: output
             })
 
-  terraform-apply-staging:
-    name: Terraform Apply (staging)
+  terraform-apply-lab:
+    name: Terraform Apply (lab)
     # if: github.ref == 'lab' && github.event_name == 'push'
     runs-on: ubuntu-latest
 
@@ -128,13 +128,13 @@ jobs:
 
       - name: Terraform Apply
         run: |
-          terraform workspace select staging
+          terraform workspace select lab
           terraform apply -auto-approve
 
   terraform-apply-prod:
     name: Terraform Apply (prod)
     # if: github.ref == 'lab' && github.event_name == 'push'
-    needs: terraform-apply-staging
+    needs: terraform-apply-lab
     runs-on: ubuntu-latest
 
     environment:
