@@ -3,16 +3,18 @@ name: Terraform Apply
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
     
     env:
-      ARM_CLIENT_ID: feadf2df-afd7-4d70-bb4d-594b5dcabdae
+      ARM_CLIENT_ID: 404cb109-2150-4ce9-9615-b7755da17209
       ARM_CLIENT_SECRET: ${{secrets.TF_ARM_CLIENT_SECRET}}
-      ARM_SUBSCRIPTION_ID: 475a2aea-10e5-4288-abc9-9efd4f3dc215
-      ARM_TENANT_ID: 2988608b-70b9-4911-9303-78aadfa95034
+      ARM_SUBSCRIPTION_ID: 71a3925d-615b-4b25-82e5-f7c9e6f24e6b
+      ARM_TENANT_ID: ce849bab-cc1c-465b-b62e-18f07c9ac198
       
     steps:
       - uses: actions/checkout@v2
