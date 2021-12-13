@@ -106,7 +106,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: staging
+      name: lab
 
     steps:
       - name: Checkout with Submodules
